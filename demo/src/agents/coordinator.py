@@ -164,11 +164,20 @@ class MultiAgentCoordinator:
         formatted_history = []
         
         # Convert from role-based format to user/agent format
-        for i in range(0, len(history), 2):
-            if i + 1 < len(history):
-                formatted_history.append({
-                    "user": history[i]["content"],
-                    "agent": history[i + 1]["content"]
-                })
+        current_turn = {}
+        for message in history:
+            if message["role"] == "user":
+                if current_turn:
+                    formatted_history.append(current_turn)
+                current_turn = {"user": message["content"], "agent": ""}
+            elif message["role"] == "assistant":
+                if current_turn:
+                    current_turn["agent"] = message["content"]
+                    formatted_history.append(current_turn)
+                    current_turn = {}
+        
+        # Add the last turn if it's incomplete
+        if current_turn:
+            formatted_history.append(current_turn)
         
         return formatted_history

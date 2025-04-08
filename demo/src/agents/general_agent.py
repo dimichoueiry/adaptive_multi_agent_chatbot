@@ -43,14 +43,17 @@ class GeneralAgent(BaseAgent):
         knowledge_context = self.knowledge_enhancer.format_knowledge_for_prompt(enhanced_knowledge)
         
         # Process the query using LangChain
-        response = await self.conversation.arun(
-            input=query,
+        response_dict = await self.invoke(
+            query=query,
             name=self.name,
             description=self.description,
-            knowledge=knowledge_context
+            knowledge=knowledge_context,
+            conversation_history=conversation_history
         )
         
-        # Add to conversation history
-        self.add_to_history(query, response)
+        response_content = response_dict["response"]
         
-        return response
+        # Add to conversation history using the string response
+        await self.add_to_history(query, response_content)
+        
+        return response_content

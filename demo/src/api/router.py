@@ -3,6 +3,7 @@ API router for the chatbot endpoints.
 """
 
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import asyncio
@@ -27,6 +28,66 @@ class ChatResponse(BaseModel):
 
 # Initialize the multi-agent coordinator
 coordinator = MultiAgentCoordinator()
+
+@router.get("/", response_class=HTMLResponse)
+async def root():
+    """Serve the welcome page."""
+    return """
+    <html>
+        <head>
+            <title>Adaptive Multi-Agent Chatbot System</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+                h1 {
+                    color: #333;
+                }
+                .endpoint {
+                    background-color: #f5f5f5;
+                    padding: 15px;
+                    margin: 10px 0;
+                    border-radius: 5px;
+                }
+                code {
+                    background-color: #f0f0f0;
+                    padding: 2px 5px;
+                    border-radius: 3px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Welcome to the Adaptive Multi-Agent Chatbot System</h1>
+            <p>This is an intelligent chatbot system that uses multiple specialized agents to handle different types of queries.</p>
+            
+            <h2>Available Endpoints:</h2>
+            
+            <div class="endpoint">
+                <h3>Chat Endpoint</h3>
+                <p><code>POST /api/chat</code></p>
+                <p>Send a message to the chatbot and get a response.</p>
+                <p>Example request:</p>
+                <pre>
+{
+    "message": "What is artificial intelligence?",
+    "conversation_id": "optional-conversation-id"
+}
+                </pre>
+            </div>
+            
+            <div class="endpoint">
+                <h3>List Agents Endpoint</h3>
+                <p><code>GET /api/agents</code></p>
+                <p>Get information about available agents.</p>
+            </div>
+            
+            <p>For more information, visit the <a href="/docs">API documentation</a>.</p>
+        </body>
+    </html>
+    """
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):

@@ -13,7 +13,7 @@ class ConversationManager:
     
     def __init__(self):
         """Initialize the conversation manager."""
-        self.conversations = {}
+        self.conversations: Dict[str, List[Dict[str, str]]] = {}
     
     def create_conversation(self, conversation_id: Optional[str] = None) -> str:
         """
@@ -29,8 +29,9 @@ class ConversationManager:
         if conversation_id is None:
             conversation_id = str(uuid.uuid4())
         
-        # Initialize conversation history
-        self.conversations[conversation_id] = []
+        # Initialize conversation history if not exists
+        if conversation_id not in self.conversations:
+            self.conversations[conversation_id] = []
         
         return conversation_id
     

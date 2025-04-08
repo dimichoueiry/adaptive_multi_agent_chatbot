@@ -1,18 +1,19 @@
 """
-Wikipedia knowledge source implementation.
+Wikipedia knowledge source implementation using LangChain.
 """
 
-import wikipedia
 from typing import List, Dict, Any, Optional
+from langchain_community.tools import WikipediaQueryRun
+from langchain_community.utilities import WikipediaAPIWrapper
 
 class WikipediaSource:
     """
-    Knowledge source that retrieves information from Wikipedia.
+    Knowledge source that retrieves information from Wikipedia using LangChain.
     """
     
     def __init__(self):
         """Initialize the Wikipedia knowledge source."""
-        pass
+        self.wikipedia = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
     
     async def search(self, query: str, results_limit: int = 5) -> List[str]:
         """
@@ -26,7 +27,16 @@ class WikipediaSource:
             List of page titles
         """
         try:
-            return wikipedia.search(query, results=results_limit)
+            # Use LangChain's Wikipedia tool to search
+            results = self.wikipedia.run(query)
+            # Extract titles from the results
+            titles = []
+            for line in results.split('\n'):
+                if line.strip().startswith('Title:'):
+                    titles.append(line.replace('Title:', '').strip())
+                if len(titles) >= results_limit:
+                    break
+            return titles
         except Exception as e:
             print(f"Error searching Wikipedia: {e}")
             return []
@@ -43,17 +53,9 @@ class WikipediaSource:
             Summary text
         """
         try:
-            return wikipedia.summary(title, sentences=sentences)
-        except wikipedia.exceptions.DisambiguationError as e:
-            # Handle disambiguation pages by returning the first option
-            if e.options:
-                try:
-                    return wikipedia.summary(e.options[0], sentences=sentences)
-                except:
-                    return f"Multiple Wikipedia pages found for '{title}'. Options include: {', '.join(e.options[:5])}."
-            return f"Disambiguation error for '{title}'."
-        except wikipedia.exceptions.PageError:
-            return f"No Wikipedia page found for '{title}'."
+            # Use LangChain's Wikipedia tool to get summary
+            query = f"Give me a {sentences} sentence summary of the Wikipedia article '{title}'"
+            return self.wikipedia.run(query)
         except Exception as e:
             return f"Error retrieving Wikipedia summary: {e}"
     
@@ -68,18 +70,8 @@ class WikipediaSource:
             Full page content
         """
         try:
-            page = wikipedia.page(title)
-            return page.content
-        except wikipedia.exceptions.DisambiguationError as e:
-            # Handle disambiguation pages by returning the first option
-            if e.options:
-                try:
-                    page = wikipedia.page(e.options[0])
-                    return page.content
-                except:
-                    return f"Multiple Wikipedia pages found for '{title}'. Options include: {', '.join(e.options[:5])}."
-            return f"Disambiguation error for '{title}'."
-        except wikipedia.exceptions.PageError:
-            return f"No Wikipedia page found for '{title}'."
+            # Use LangChain's Wikipedia tool to get full content
+            query = f"Give me the full content of the Wikipedia article '{title}'"
+            return self.wikipedia.run(query)
         except Exception as e:
             return f"Error retrieving Wikipedia content: {e}"
