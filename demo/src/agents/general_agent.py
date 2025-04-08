@@ -22,8 +22,8 @@ class GeneralAgent(BaseAgent):
         """
         super().__init__(name, description, model)
         
-        # Initialize knowledge enhancer
-        self.knowledge_enhancer = KnowledgeEnhancer()
+        # Initialize knowledge enhancer with only Wikipedia
+        self.knowledge_enhancer = KnowledgeEnhancer(use_wikipedia=True, use_vector_store=False)
     
     async def process_query(self, query: str, conversation_history: Optional[List[Dict[str, Any]]] = None) -> str:
         """
@@ -39,12 +39,8 @@ class GeneralAgent(BaseAgent):
         # Enhance the query with relevant knowledge
         enhanced_knowledge = await self.knowledge_enhancer.enhance_query(query, top_k=3)
         
-        # Format knowledge for the prompt
-        knowledge_context = ""
-        if enhanced_knowledge.get("wikipedia"):
-            knowledge_context += "\nRelevant Information from Wikipedia:\n"
-            for item in enhanced_knowledge["wikipedia"]:
-                knowledge_context += f"- {item}\n"
+        # Format knowledge for the prompt using the enhancer's formatter
+        knowledge_context = self.knowledge_enhancer.format_knowledge_for_prompt(enhanced_knowledge)
         
         # Process the query using LangChain
         response = await self.conversation.arun(

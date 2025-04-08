@@ -22,8 +22,8 @@ class ConcordiaCSAgent(BaseAgent):
         """
         super().__init__(name, description, model)
         
-        # Initialize knowledge enhancer
-        self.knowledge_enhancer = KnowledgeEnhancer()
+        # Initialize knowledge enhancer with only vector store
+        self.knowledge_enhancer = KnowledgeEnhancer(use_wikipedia=False, use_vector_store=True)
     
     async def process_query(self, query: str, conversation_history: Optional[List[Dict[str, Any]]] = None) -> str:
         """
@@ -39,14 +39,8 @@ class ConcordiaCSAgent(BaseAgent):
         # Enhance the query with relevant knowledge from vector store
         enhanced_knowledge = await self.knowledge_enhancer.enhance_query(query, top_k=3)
         
-        # Format knowledge for the prompt
-        knowledge_context = ""
-        if enhanced_knowledge.get("vector_store"):
-            knowledge_context += "\nRelevant Information from University Admissions Database:\n"
-            for item in enhanced_knowledge["vector_store"]:
-                knowledge_context += f"- {item['text']}\n"
-                if item.get('metadata'):
-                    knowledge_context += f"  Additional context: {item['metadata']}\n"
+        # Format knowledge for the prompt using the enhancer's formatter
+        knowledge_context = self.knowledge_enhancer.format_knowledge_for_prompt(enhanced_knowledge)
         
         # Process the query using LangChain
         response = await self.conversation.arun(

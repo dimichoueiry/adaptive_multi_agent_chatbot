@@ -1,5 +1,5 @@
 """
-AI Knowledge agent implementation using LangChain.
+AI and machine learning questions agent implementation using LangChain.
 """
 
 from typing import List, Dict, Any, Optional
@@ -8,7 +8,7 @@ from ..knowledge.enhancer import KnowledgeEnhancer
 
 class AIAgent(BaseAgent):
     """
-    Agent that specializes in artificial intelligence related questions.
+    Agent that handles questions about AI, machine learning, and related topics.
     """
     
     def __init__(self, name: str, description: str, model: str = "mistral"):
@@ -22,12 +22,12 @@ class AIAgent(BaseAgent):
         """
         super().__init__(name, description, model)
         
-        # Initialize knowledge enhancer
-        self.knowledge_enhancer = KnowledgeEnhancer()
+        # Initialize knowledge enhancer with both Wikipedia and vector store
+        self.knowledge_enhancer = KnowledgeEnhancer(use_wikipedia=True, use_vector_store=True)
     
     async def process_query(self, query: str, conversation_history: Optional[List[Dict[str, Any]]] = None) -> str:
         """
-        Process queries related to artificial intelligence using LangChain.
+        Process an AI/ML query using LangChain.
         
         Args:
             query: The user's query text
@@ -39,12 +39,8 @@ class AIAgent(BaseAgent):
         # Enhance the query with relevant knowledge
         enhanced_knowledge = await self.knowledge_enhancer.enhance_query(query, top_k=3)
         
-        # Format knowledge for the prompt
-        knowledge_context = ""
-        if enhanced_knowledge.get("wikipedia"):
-            knowledge_context += "\nRelevant Information from Wikipedia:\n"
-            for item in enhanced_knowledge["wikipedia"]:
-                knowledge_context += f"- {item}\n"
+        # Format knowledge for the prompt using the enhancer's formatter
+        knowledge_context = self.knowledge_enhancer.format_knowledge_for_prompt(enhanced_knowledge)
         
         # Process the query using LangChain
         response = await self.conversation.arun(

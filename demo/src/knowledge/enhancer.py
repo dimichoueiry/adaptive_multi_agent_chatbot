@@ -13,16 +13,25 @@ class KnowledgeEnhancer:
     Enhances agent responses with external knowledge.
     """
     
-    def __init__(self):
-        """Initialize the knowledge enhancer."""
+    def __init__(self, use_wikipedia: bool = False, use_vector_store: bool = True):
+        """
+        Initialize the knowledge enhancer.
+        
+        Args:
+            use_wikipedia: Whether to use Wikipedia as a knowledge source
+            use_vector_store: Whether to use vector store as a knowledge source
+        """
         # Initialize knowledge sources
         self.sources = {}
         
-        if KNOWLEDGE_SOURCES.get("wikipedia", {}).get("enabled", False):
+        if use_wikipedia and KNOWLEDGE_SOURCES.get("wikipedia", {}).get("enabled", False):
             self.sources["wikipedia"] = WikipediaSource()
         
-        # Initialize vector store for storing retrieved knowledge
-        self.vector_store = VectorStore(collection_name="external_knowledge")
+        # Initialize vector store if needed
+        if use_vector_store:
+            self.vector_store = VectorStore(collection_name="external_knowledge")
+        else:
+            self.vector_store = None
     
     async def enhance_query(self, query: str, top_k: int = 3) -> Dict[str, Any]:
         """
@@ -37,10 +46,11 @@ class KnowledgeEnhancer:
         """
         results = {}
         
-        # Search vector store for relevant information
-        vector_results = await self.vector_store.similarity_search(query, k=top_k)
-        if vector_results:
-            results["vector_store"] = vector_results
+        # Search vector store if enabled
+        if self.vector_store:
+            vector_results = await self.vector_store.similarity_search(query, k=top_k)
+            if vector_results:
+                results["vector_store"] = vector_results
         
         # Search Wikipedia if enabled
         if "wikipedia" in self.sources:
