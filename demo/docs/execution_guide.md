@@ -33,33 +33,48 @@ After installing Ollama, pull the required model:
 ollama pull llama3
 ```
 
-## Step 3: Clone or Download the Project
+## Step 3: Set Up the Project
 
+### Clone or Download the Project
 If using Git:
 ```bash
-git clone https://github.com/your-username/adaptive-multi-agent-chatbot.git
+git clone <repository-url>
 cd adaptive-multi-agent-chatbot
 ```
 
-Or simply extract the provided ZIP file to a directory of your choice.
+Or extract the provided ZIP file to a directory of your choice.
+
+### Create and Activate Virtual Environment
+It's recommended to use a virtual environment:
+
+```bash
+# Create virtual environment
+python -m venv .venv
+
+# Activate virtual environment
+# On Windows:
+.venv\Scripts\activate
+# On Linux/macOS:
+source .venv/bin/activate
+```
 
 ## Step 4: Install Dependencies
 
-Navigate to the project directory and install the required Python packages:
+With the virtual environment activated, install all required dependencies:
 
 ```bash
-pip install langchain ollama fastapi uvicorn faiss-cpu chromadb pydantic python-dotenv requests wikipedia
+pip install -r requirements.txt
 ```
 
-## Step 5: Configure Environment (Optional)
+## Step 5: Configure Environment
 
 Create a `.env` file in the project root directory with the following content:
 
 ```
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=llama3
-API_HOST=0.0.0.0
-API_PORT=8000
+API_HOST=localhost
+API_PORT=8080
 ```
 
 You can modify these values according to your setup if needed.
@@ -77,57 +92,84 @@ ollama serve
 From the project root directory, run:
 
 ```bash
-python main.py
+python demo/main.py
 ```
 
-You should see output indicating that the server is running, typically on http://0.0.0.0:8000.
+You should see output indicating that the server is running on http://localhost:8080.
 
-## Step 8: Interact with the Chatbot
+## Step 8: Access the API Documentation
 
-You can interact with the chatbot using:
+The API documentation is available at:
+- Swagger UI: http://localhost:8080/docs
+- ReDoc: http://localhost:8080/redoc
 
-### cURL:
+## Step 9: Test Different Agent Types
+
+The system includes three specialized agents:
+- **Concordia CS Agent**: Handles questions about Concordia's Computer Science program
+- **AI Agent**: Handles artificial intelligence related queries
+- **General Questions Agent**: Handles general knowledge questions
+
+Example queries for each agent:
+
+### Using cURL:
 ```bash
-curl -X POST "http://localhost:8000/api/chat" \
+curl -X POST "http://localhost:8080/api/chat" \
      -H "Content-Type: application/json" \
-     -d '{"message": "What is artificial intelligence?"}'
+     -d '{"message": "What are the admission requirements for Concordia CS program?"}'
 ```
 
-### Python:
+### Using Python:
 ```python
 import requests
 
 response = requests.post(
-    "http://localhost:8000/api/chat",
-    json={"message": "What is artificial intelligence?"}
+    "http://localhost:8080/api/chat",
+    json={"message": "What are the admission requirements for Concordia CS program?"}
 )
 print(response.json())
 ```
 
-### Web Browser:
-You can access the API documentation by opening http://localhost:8000/docs in your web browser.
-
-## Step 9: Testing Different Agent Types
-
-Try different types of queries to see how the system routes to different agents:
-
-- General knowledge: "What is the capital of France?"
-- Concordia CS admissions: "What are the requirements for Concordia's Computer Science program?"
-- AI-related: "Explain how neural networks work."
-
 ## Troubleshooting
 
-### Issue: Cannot connect to Ollama
-- Ensure Ollama is running with `ollama serve`
-- Check if the OLLAMA_BASE_URL in your configuration matches the actual Ollama server address
+### Common Issues and Solutions
 
-### Issue: Missing dependencies
-- Run `pip install -r requirements.txt` if a requirements file is provided
-- Install missing packages individually as needed
+#### Cannot connect to Ollama
+- Verify Ollama is running with `ollama serve`
+- Check if the OLLAMA_BASE_URL in your .env file matches the Ollama server address
+- Ensure the llama3 model is downloaded using `ollama list`
 
-### Issue: Port already in use
-- Change the API_PORT in your .env file or configuration
-- Alternatively, stop the process using the conflicting port
+#### API Connection Issues
+- Confirm the API_HOST and API_PORT in .env match your setup
+- Check if another process is using port 8080
+- Verify you're using the correct URL in your requests
+
+#### Dependencies Issues
+- Ensure you're in the virtual environment (you should see (.venv) in your terminal)
+- Try removing and recreating the virtual environment if dependencies are corrupted
+- Make sure you have the latest pip: `python -m pip install --upgrade pip`
+
+#### Virtual Environment Issues
+- If venv creation fails, ensure you have Python 3.10+ installed
+- On Windows, you might need to run PowerShell as administrator
+- On Linux/macOS, you might need to install python3-venv package
+
+## Project Structure
+
+For reference, the project is organized as follows:
+```
+demo/
+├── docs/          # Documentation files
+├── src/           # Source code
+│   ├── agents/    # Agent implementations
+│   ├── api/       # FastAPI endpoints
+│   ├── config/    # Configuration
+│   ├── data/      # Data management
+│   ├── knowledge/ # Knowledge base
+│   └── utils/     # Utilities
+├── main.py        # Entry point
+└── todo.md        # Development tasks
+```
 
 ## Additional Information
 
