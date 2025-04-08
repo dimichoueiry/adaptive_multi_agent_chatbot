@@ -36,20 +36,17 @@ class ConcordiaCSAgent(BaseAgent):
         Returns:
             The agent's response to the query
         """
-        # Enhance the query with relevant knowledge
+        # Enhance the query with relevant knowledge from vector store
         enhanced_knowledge = await self.knowledge_enhancer.enhance_query(query, top_k=3)
         
         # Format knowledge for the prompt
         knowledge_context = ""
         if enhanced_knowledge.get("vector_store"):
-            knowledge_context += "\nFrom University Admissions Database:\n"
+            knowledge_context += "\nRelevant Information from University Admissions Database:\n"
             for item in enhanced_knowledge["vector_store"]:
                 knowledge_context += f"- {item['text']}\n"
-        
-        if enhanced_knowledge.get("wikipedia"):
-            knowledge_context += "\nFrom Wikipedia:\n"
-            for item in enhanced_knowledge["wikipedia"]:
-                knowledge_context += f"- {item}\n"
+                if item.get('metadata'):
+                    knowledge_context += f"  Additional context: {item['metadata']}\n"
         
         # Process the query using LangChain
         response = await self.conversation.arun(
