@@ -2,147 +2,137 @@
 
 ## Executive Summary
 
-This technical report details the design, implementation, and evaluation of an Adaptive Multi-Agent Chatbot System using Ollama. The system features a multi-agent architecture with specialized agents for different domains, context-awareness capabilities, and integration with external knowledge sources. The system successfully demonstrates the application of modern AI techniques to create an intelligent conversational system that can adapt to different query domains and maintain coherent multi-turn conversations.
+This technical report details the design, implementation, and evaluation of an Adaptive Multi-Agent Chatbot System using Ollama. The system features a multi-agent architecture with specialized agents for different domains (Concordia CS admissions, AI knowledge, and general questions), leveraging modern language models through Ollama for natural language processing and understanding.
 
 ## 1. Introduction
 
 ### 1.1 Project Objective
 
-The objective of this project was to design and implement a multi-agent chatbot system that leverages Ollama for intelligent conversations across multiple domains. The system needed to adapt dynamically based on context, past interactions, and external knowledge sources.
+The objective of this project was to create an intelligent multi-agent chatbot system that can effectively handle queries across different specialized domains, particularly focusing on Concordia CS admissions, AI-related topics, and general knowledge questions.
 
 ### 1.2 Problem Statement
 
-Traditional chatbots often struggle with:
-- Limited domain knowledge
-- Inability to maintain context over multiple interactions
-- Lack of integration with external knowledge sources
-- Poor routing of queries to appropriate knowledge domains
+Traditional chatbots often face challenges with:
+- Domain specialization and expertise
+- Knowledge integration from external sources
+- Efficient query routing to appropriate specialized agents
+- Maintaining conversation coherence
 
-This project addresses these limitations through a multi-agent architecture, context tracking, and knowledge integration.
+This project addresses these challenges through a modular multi-agent architecture and knowledge integration.
 
 ## 2. System Architecture
 
 ### 2.1 High-Level Architecture
 
-The system follows a modular architecture with the following key components:
+The system follows a modular architecture organized into the following components:
 
-1. **Multi-Agent Coordinator**: Central component that analyzes queries and routes them to appropriate specialized agents
-2. **Specialized Agents**: Domain-specific agents for general questions, Concordia CS admissions, and AI-related topics
-3. **Knowledge Enhancement**: Integration with external sources like Wikipedia
-4. **Context Management**: Tracking of conversation history for context-aware responses
-5. **API Layer**: FastAPI-based interface for client interactions
+```
+demo/
+├── docs/          # Project documentation
+├── src/           # Source code
+│   ├── agents/    # Specialized agent implementations
+│   ├── api/       # FastAPI endpoints
+│   ├── config/    # Configuration management
+│   ├── data/      # Data storage and management
+│   ├── knowledge/ # Knowledge base integration
+│   └── utils/     # Utility functions
+├── main.py        # Application entry point
+└── todo.md        # Development tasks
+```
 
 ### 2.2 Component Interactions
 
 The system operates through the following workflow:
 
-1. User submits a query through the API
-2. The coordinator analyzes the query content and conversation context
-3. The coordinator routes the query to the most appropriate specialized agent
-4. External knowledge is retrieved and integrated with the query
-5. The selected agent processes the enhanced query and generates a response
-6. The response is returned to the user and added to conversation history
+1. Client sends a query through the FastAPI endpoint
+2. Query is analyzed and routed to the appropriate specialized agent:
+   - Concordia CS Agent for university admissions queries
+   - AI Agent for artificial intelligence topics
+   - General Questions Agent for other topics
+3. The agent processes the query using Ollama
+4. Response is enhanced with external knowledge when relevant
+5. Final response is returned through the API
 
 ### 2.3 Technology Stack
 
-The implementation leverages the following technologies:
+The implementation utilizes:
 
-- **Ollama**: For LLM-based response generation
-- **LangChain**: For memory and prompt engineering
-- **FastAPI**: For API deployment
-- **Vector Databases**: For contextual memory storage (placeholder implementation)
-- **Wikipedia API**: For external knowledge integration
-- **Python**: As the primary programming language
+- **Ollama**: Core language model integration
+- **FastAPI**: RESTful API framework
+- **Python 3.10+**: Primary programming language
+- **FAISS**: Vector storage for embeddings
+- **Wikipedia API**: External knowledge integration
+- **Langchain**: LLM framework integration
+- **Uvicorn**: ASGI server
+- **Python-dotenv**: Environment management
 
 ## 3. Implementation Details
 
-### 3.1 Multi-Agent Architecture
+### 3.1 Multi-Agent System
 
-The multi-agent architecture consists of:
+The system implements three specialized agents:
+- **Concordia CS Agent**: Handles queries about Concordia's Computer Science program
+- **AI Agent**: Processes artificial intelligence related questions
+- **General Questions Agent**: Manages general knowledge queries
 
-- **BaseAgent**: Abstract base class defining the agent interface
-- **GeneralAgent**: Handles general knowledge questions
-- **ConcordiaCSAgent**: Specializes in Concordia University CS admissions
-- **AIAgent**: Specializes in artificial intelligence topics
-- **MultiAgentCoordinator**: Routes queries to appropriate agents
-
-The coordinator uses keyword matching and conversation context to determine the most appropriate agent for each query.
-
-### 3.2 Context-Awareness Implementation
-
-Context-awareness is implemented through:
-
-- **ConversationManager**: Tracks conversation history across multiple sessions
-- **History Formatting**: Converts conversation history into a format suitable for agent consumption
-- **Context-Based Routing**: Uses conversation history to determine query context
-
-### 3.3 Knowledge Integration
+### 3.2 Knowledge Integration
 
 External knowledge integration is implemented through:
+- **Wikipedia Integration**: Retrieves relevant information from Wikipedia
+- **Vector Store**: Uses FAISS for document embeddings and retrieval
 
-- **WikipediaSource**: Retrieves information from Wikipedia
-- **KnowledgeEnhancer**: Enhances queries with external knowledge
-- **Vector Store**: Placeholder implementation for storing and retrieving document embeddings
+### 3.3 API Implementation
 
-### 3.4 API Implementation
-
-The API is implemented using FastAPI with:
-
-- **Router**: Defines API endpoints for chat and agent listing
-- **Request/Response Models**: Structured data models for API interactions
-- **Error Handling**: Proper error handling and status codes
+The API layer is implemented using FastAPI with:
+- **REST Endpoints**: For chat interactions
+- **Async Support**: For better performance
+- **OpenAPI Documentation**: Auto-generated API documentation
+- **ReDoc Integration**: Alternative API documentation view
 
 ## 4. Evaluation
 
 ### 4.1 Functionality Assessment
 
-The system successfully implements all required functionality:
-
-- Multi-agent architecture with specialized agents
-- Context-awareness for multi-turn conversations
-- Integration with external knowledge sources
-- API for client interactions
+The system successfully implements:
+- Multi-agent architecture with three specialized agents
+- External knowledge integration through Wikipedia
+- FastAPI-based interface with comprehensive documentation
+- Modular and maintainable codebase structure
 
 ### 4.2 Performance Considerations
 
-While not fully benchmarked, the system design considers performance through:
+The system is designed for efficiency through:
+- Async API implementation
+- Efficient query routing to specialized agents
+- Vector-based knowledge retrieval
+- Environment-based configuration
 
-- Limiting conversation history length
-- Efficient query routing
-- Asynchronous API implementation
+### 4.3 Current Limitations
 
-### 4.3 Limitations
-
-Current limitations include:
-
-- Reliance on keyword matching for agent selection
-- Limited external knowledge sources (Wikipedia only)
-- Placeholder implementation for vector database
-- No reinforcement learning for response improvement
+Areas for improvement include:
+- Limited number of specialized agents
+- Single external knowledge source (Wikipedia)
+- Basic authentication and security features
+- Limited caching implementation
 
 ## 5. Future Work
 
-Potential areas for future improvement include:
-
-- Implementing full vector database functionality
-- Adding more external knowledge sources
-- Implementing reinforcement learning for response improvement
-- Developing a web-based user interface
-- Adding user authentication and personalization
-- Implementing more sophisticated agent selection logic
+Planned enhancements include:
+- Implementation of additional specialized agents
+- Integration of authentication and rate limiting
+- Enhanced knowledge base integration
+- Addition of monitoring and logging
+- Implementation of caching mechanisms
+- Development of comprehensive test suite
 
 ## 6. Conclusion
 
-The Adaptive Multi-Agent Chatbot System successfully demonstrates the application of modern AI techniques to create an intelligent conversational system. The multi-agent architecture, context-awareness capabilities, and external knowledge integration enable the system to provide relevant and coherent responses across multiple domains.
-
-The modular design allows for future extensions and improvements, making the system adaptable to evolving requirements and technologies.
+The Adaptive Multi-Agent Chatbot System successfully demonstrates a practical implementation of a domain-specialized chatbot system. The modular architecture, specialized agents, and external knowledge integration provide a solid foundation for future enhancements and extensions.
 
 ## 7. References
 
 1. Ollama Documentation: https://ollama.com/docs
-2. LangChain Documentation: https://python.langchain.com/docs/
-3. FastAPI Documentation: https://fastapi.tiangolo.com/
+2. FastAPI Documentation: https://fastapi.tiangolo.com/
+3. FAISS Documentation: https://github.com/facebookresearch/faiss
 4. Wikipedia API Documentation: https://wikipedia.readthedocs.io/
-5. Vector Databases (FAISS, ChromaDB) Documentation
-   - FAISS: https://github.com/facebookresearch/faiss
-   - ChromaDB: https://docs.trychroma.com/
+5. Langchain Documentation: https://python.langchain.com/docs/
