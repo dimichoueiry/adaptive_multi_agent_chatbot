@@ -13,8 +13,8 @@ OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 
 # Vector database settings
-VECTOR_DB_TYPE = os.getenv("VECTOR_DB_TYPE", "chroma")  # Options: chroma, faiss
-VECTOR_DB_PATH = os.getenv("VECTOR_DB_PATH", "/home/ubuntu/project/data/vectordb")
+VECTOR_DB_TYPE = "faiss"  # Options: "chroma", "faiss"
+VECTOR_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "vector_db")
 
 # API settings
 API_HOST = os.getenv("API_HOST", "0.0.0.0")

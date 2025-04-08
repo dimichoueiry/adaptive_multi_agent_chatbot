@@ -6,9 +6,14 @@ import os
 import shutil
 from typing import List, Dict, Any, Optional, Union
 import numpy as np
+import uuid
+import sys
+
+# Add the parent directory to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import based on configured vector DB type
-from ..config import VECTOR_DB_TYPE, VECTOR_DB_PATH
+from config import VECTOR_DB_TYPE, VECTOR_DB_PATH
 
 class VectorStore:
     """
@@ -98,31 +103,60 @@ class VectorStore:
         Returns:
             List of IDs for the added texts
         """
-        # This is a placeholder - in a real implementation, we would:
-        # 1. Generate embeddings for the texts
-        # 2. Add the embeddings to the vector store
-        # 3. Return the IDs
-        
-        # For now, we'll just print a message
-        print(f"Adding {len(texts)} texts to vector store")
-        return ["id1", "id2", "id3"]  # Placeholder
+        if VECTOR_DB_TYPE.lower() == "chroma":
+            # Generate IDs if not provided
+            if ids is None:
+                ids = [str(uuid.uuid4()) for _ in texts]
+            
+            # Ensure metadatas is a list of the same length as texts
+            if metadatas is None:
+                metadatas = [{} for _ in texts]
+            
+            # Add documents to ChromaDB
+            self.collection.add(
+                documents=texts,
+                metadatas=metadatas,
+                ids=ids
+            )
+            
+            print(f"Added {len(texts)} texts to ChromaDB collection: {self.collection_name}")
+            return ids
+            
+        elif VECTOR_DB_TYPE.lower() == "faiss":
+            # FAISS implementation would go here
+            pass
     
-    async def similarity_search(self, query: str, k: int = 4) -> List[Dict[str, Any]]:
+    async def similarity_search(self, query: str, k: int = 4, where: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         Search for similar texts in the vector store.
         
         Args:
             query: Query text
             k: Number of results to return
+            where: Optional filter conditions for metadata
             
         Returns:
             List of dictionaries containing text and metadata
         """
-        # This is a placeholder - in a real implementation, we would:
-        # 1. Generate an embedding for the query
-        # 2. Search the vector store for similar embeddings
-        # 3. Return the corresponding texts and metadata
-        
-        # For now, we'll just print a message
-        print(f"Searching for similar texts to: {query}")
-        return [{"text": "Sample result", "metadata": {}}]  # Placeholder
+        if VECTOR_DB_TYPE.lower() == "chroma":
+            # Perform similarity search in ChromaDB
+            results = self.collection.query(
+                query_texts=[query],
+                n_results=k,
+                where=where
+            )
+            
+            # Format results
+            formatted_results = []
+            for i in range(len(results['ids'][0])):
+                formatted_results.append({
+                    'text': results['documents'][0][i],
+                    'metadata': results['metadatas'][0][i],
+                    'distance': results['distances'][0][i]
+                })
+            
+            return formatted_results
+            
+        elif VECTOR_DB_TYPE.lower() == "faiss":
+            # FAISS implementation would go here
+            pass

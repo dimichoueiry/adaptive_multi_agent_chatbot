@@ -24,17 +24,23 @@ class KnowledgeEnhancer:
         # Initialize vector store for storing retrieved knowledge
         self.vector_store = VectorStore(collection_name="external_knowledge")
     
-    async def enhance_query(self, query: str) -> Dict[str, Any]:
+    async def enhance_query(self, query: str, top_k: int = 3) -> Dict[str, Any]:
         """
         Enhance a query with external knowledge.
         
         Args:
             query: The user's query
+            top_k: Number of most similar results to return
             
         Returns:
             Dictionary containing retrieved knowledge
         """
         results = {}
+        
+        # Search vector store for relevant information
+        vector_results = await self.vector_store.similarity_search(query, k=top_k)
+        if vector_results:
+            results["vector_store"] = vector_results
         
         # Search Wikipedia if enabled
         if "wikipedia" in self.sources:
@@ -70,6 +76,14 @@ class KnowledgeEnhancer:
             Formatted knowledge string
         """
         formatted = ""
+        
+        # Format vector store knowledge
+        if "vector_store" in knowledge and knowledge["vector_store"]:
+            formatted += "\n\nRelevant information from knowledge base:\n"
+            for item in knowledge["vector_store"]:
+                formatted += f"\n{item['text']}\n"
+                if item.get('metadata'):
+                    formatted += f"Additional context: {item['metadata']}\n"
         
         # Format Wikipedia knowledge
         if "wikipedia" in knowledge and knowledge["wikipedia"]:
