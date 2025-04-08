@@ -1,10 +1,14 @@
 """
-Concordia CS Admissions agent implementation.
+Concordia CS Admissions agent implementation using LangChain.
 """
 
 from typing import List, Dict, Any, Optional
-import aiohttp
-import json
+from langchain.llms import Ollama
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationChain
+from langchain.vectorstores import Chroma
+from langchain.embeddings import OllamaEmbeddings
+from langchain.prompts import PromptTemplate
 from ..config import OLLAMA_BASE_URL
 from .base_agent import BaseAgent
 from ..knowledge.enhancer import KnowledgeEnhancer
@@ -24,11 +28,62 @@ class ConcordiaCSAgent(BaseAgent):
             model: Name of the model to use (default: mistral)
         """
         super().__init__(name, description, model)
+        
+        # Initialize Ollama LLM
+        self.llm = Ollama(
+            base_url=OLLAMA_BASE_URL,
+            model=model,
+            temperature=0.7,
+            num_thread=4
+        )
+        
+        # Initialize embeddings
+        self.embeddings = OllamaEmbeddings(
+            base_url=OLLAMA_BASE_URL,
+            model=model
+        )
+        
+        # Initialize vector store
+        self.vector_store = Chroma(
+            collection_name="concordia_cs",
+            embedding_function=self.embeddings
+        )
+        
+        # Initialize memory
+        self.memory = ConversationBufferMemory(
+            memory_key="history",
+            return_messages=True
+        )
+        
+        # Create prompt template
+        self.prompt = PromptTemplate(
+            input_variables=["history", "input", "knowledge"],
+            template="""You are a specialized assistant named {name}. {description}
+
+Previous conversation:
+{history}
+
+Relevant Information:
+{knowledge}
+
+User: {input}
+Assistant:"""
+        )
+        
+        # Initialize conversation chain
+        self.conversation = ConversationChain(
+            llm=self.llm,
+            memory=self.memory,
+            prompt=self.prompt,
+            verbose=True
+        )
+        
+        # Initialize knowledge enhancer
         self.knowledge_enhancer = KnowledgeEnhancer()
     
     async def process_query(self, query: str, conversation_history: Optional[List[Dict[str, Any]]] = None) -> str:
         """
-        Process queries related to Concordia University CS admissions using Ollama.
+        Process queries related to Concordia University CS admissions using LangChain.
         
         Args:
             query: The user's query text
@@ -37,20 +92,11 @@ class ConcordiaCSAgent(BaseAgent):
         Returns:
             The agent's response to the query
         """
-        # Use conversation history if provided, otherwise use the agent's history
-        history = conversation_history if conversation_history is not None else self.get_history()
-        
-        # Format conversation history for the prompt
-        formatted_history = ""
-        if history:
-            for turn in history:
-                formatted_history += f"User: {turn['user']}\nAssistant: {turn['agent']}\n\n"
-        
         # Enhance the query with relevant knowledge
         enhanced_knowledge = await self.knowledge_enhancer.enhance_query(query, top_k=3)
         
-        # Create the prompt with context and enhanced knowledge
-        knowledge_context = "\nRelevant Information:\n"
+        # Format knowledge for the prompt
+        knowledge_context = ""
         if enhanced_knowledge.get("vector_store"):
             knowledge_context += "\nFrom University Admissions Database:\n"
             for item in enhanced_knowledge["vector_store"]:
@@ -61,38 +107,15 @@ class ConcordiaCSAgent(BaseAgent):
             for item in enhanced_knowledge["wikipedia"]:
                 knowledge_context += f"- {item}\n"
         
-        prompt = f"{formatted_history}{knowledge_context}\nUser: {query}\nAssistant:"
+        # Process the query using LangChain
+        response = await self.conversation.arun(
+            input=query,
+            name=self.name,
+            description=self.description,
+            knowledge=knowledge_context
+        )
         
-        # Call Ollama API
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                f"{OLLAMA_BASE_URL}/api/generate",
-                json={
-                    "model": self.model,
-                    "prompt": prompt,
-                    "system": f"You are a specialized assistant named {self.name}. {self.description}. Provide accurate and helpful information about Concordia University's Computer Science program admissions, requirements, application process, deadlines, and related topics. Base your responses on the provided relevant information. If you don't know the answer, suggest contacting the university directly.",
-                    "stream": False,
-                    "options": {
-                        "num_gpu": 0,  # Force CPU usage
-                        "num_thread": 4  # Use 4 CPU threads
-                    }
-                }
-            ) as response:
-                if response.status == 200:
-                    # Read the response as text first
-                    response_text = await response.text()
-                    # Parse the last line as JSON (Ollama sends the final response in the last line)
-                    try:
-                        last_line = [line for line in response_text.strip().split('\n') if line.strip()][-1]
-                        result = json.loads(last_line)
-                        response_text = result.get("response", "")
-                    except (json.JSONDecodeError, IndexError, KeyError) as e:
-                        return f"Error parsing response: {str(e)}"
-                    
-                    # Add to conversation history
-                    self.add_to_history(query, response_text)
-                    
-                    return response_text
-                else:
-                    error_text = await response.text()
-                    return f"Error processing query: {error_text}"
+        # Add to conversation history
+        self.add_to_history(query, response)
+        
+        return response
