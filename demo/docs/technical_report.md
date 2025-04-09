@@ -149,21 +149,40 @@ demo/
 
 ### 3.1 Technical Challenges
 
-1. **Agent Coordination**
+1. **Performance Limitations**
+   - Challenge: Slower response times due to CPU-only model execution
+   - Context:
+     - Initial plan was to use GPU acceleration
+     - Encountered persistent GPU compatibility issues
+     - Forced to fall back to CPU-only execution
+   - Impact:
+     - Significantly longer response times
+     - Higher resource utilization
+     - Limited concurrent request handling
+   - Mitigation Strategies:
+     - Optimized prompt engineering to reduce token count
+     - Implemented efficient request queuing
+     - Focused on response quality over speed
+   - Future Considerations:
+     - Exploring alternative GPU configurations
+     - Investigating cloud-based GPU options
+     - Considering model optimization techniques
+
+2. **Agent Coordination**
    - Challenge: Managing multiple specialized agents
    - Solution: Clear domain boundaries and routing logic
    - Remaining Issues:
      - Edge cases in domain overlap
      - Query classification accuracy
 
-2. **Knowledge Integration**
+3. **Knowledge Integration**
    - Challenge: Integrating external knowledge effectively
    - Solution: Structured knowledge pipeline with Wikipedia
    - Remaining Issues:
      - Limited knowledge sources
      - Real-time integration performance
 
-3. **Vector Store Implementation**
+4. **Vector Store Implementation**
    - Challenge: Efficient document embedding and retrieval
    - Solution: FAISS implementation with optimized indexing
    - Remaining Issues:
@@ -191,18 +210,32 @@ demo/
 
 ### 4.1 Architectural Improvements
 
-1. **Scalability Enhancements**
+1. **Performance Optimization**
+   - GPU Integration:
+     - Resolve GPU compatibility issues
+     - Implement GPU acceleration for model inference
+     - Optimize model loading and execution
+   - Response Time Improvements:
+     - Request batching and caching
+     - Model quantization options
+     - Parallel processing optimization
+
+2. **Scalability Enhancements**
    - Load balancing for multiple instances
    - Distributed vector store implementation
    - Caching layer integration
+   - Resource utilization optimization
 
-2. **Security Improvements**
+3. **Security Improvements**
    - Authentication system
    - Rate limiting
    - Request validation
 
-3. **Monitoring and Logging**
-   - Performance metrics collection
+4. **Monitoring and Logging**
+   - Performance metrics collection:
+     - Model inference times (CPU vs target GPU metrics)
+     - Resource utilization tracking
+     - Response time monitoring
    - Error tracking
    - Usage analytics
 
@@ -213,6 +246,8 @@ Current areas requiring attention:
 2. Basic error handling
 3. Missing monitoring infrastructure
 4. Limited documentation of internal APIs
+5. CPU-only execution limitations
+6. Lack of performance optimization features
 
 ## 5. Conclusion
 
