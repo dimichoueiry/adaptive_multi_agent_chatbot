@@ -45,11 +45,31 @@ The system is organized into specialized modules:
 - **Knowledge Module**: Integration with external knowledge sources
 - **Utils Module**: Shared utility functions and helpers
 
+The multi-agent system features:
+- **Efficient Routing**: Keyword-based agent selection through MultiAgentCoordinator
+- **Context Awareness**: Maintains conversation context for better agent selection
+- **Specialized Processing**: Each agent type has specific knowledge source configurations:
+  - General Agent: Wikipedia integration
+  - AI Agent: Combined Wikipedia and vector store
+  - Concordia CS Agent: Vector store only
+- **Conversation Management**: Custom implementation using MessageStore and ConversationManager
+
 ### 2.2 Knowledge Enhancement
 
 The system integrates with external knowledge sources through the knowledge module, with implementations for:
-- **Wikipedia Integration**: Retrieves relevant information from Wikipedia
+- **Wikipedia Integration**: Retrieves relevant information using Langchain's Wikipedia tools
 - **Vector Store**: Document embeddings and retrieval (using FAISS)
+- **Conversation Management**: Custom implementation for handling multi-turn conversations:
+  - MessageStore: Maintains conversation state using Langchain's BaseMessage objects
+  - ConversationManager: Handles multiple conversation sessions
+  - History Management: Configurable history length with automatic trimming
+  - Knowledge Integration: Seamless combination of conversation context and external knowledge
+
+The conversation system maintains context while keeping memory usage efficient through:
+- Configurable MAX_HISTORY_LENGTH setting
+- Session-based conversation tracking
+- Integration with the knowledge enhancement pipeline
+- Clean separation between conversation state and knowledge retrieval
 
 ### 2.3 API Layer
 

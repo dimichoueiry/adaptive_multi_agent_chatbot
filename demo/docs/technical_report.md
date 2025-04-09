@@ -38,9 +38,14 @@ demo/
    - Query processing and response generation
 
 3. **Knowledge Layer**
-   - Wikipedia integration for external knowledge
+   - Wikipedia integration through Langchain's tools
    - FAISS vector store for efficient information retrieval
    - Knowledge enhancement pipeline
+   - Custom conversation management system:
+     - MessageStore for maintaining conversation state
+     - ConversationManager for multi-session handling
+     - Context-aware query processing
+     - Efficient history trimming with configurable limits
 
 4. **Configuration Layer**
    - Environment-based configuration
@@ -134,7 +139,52 @@ demo/
      - Reduced coupling
      - Improved code reusability
 
-3. **Async Implementation**
+3. **Conversation Management Design**
+   - Decision: Implement custom conversation handling instead of using Langchain's memory modules
+   - Rationale:
+     - Better control over conversation state
+     - More efficient memory management
+     - Simplified integration with multi-agent system
+   - Implementation:
+     - Custom MessageStore class for conversation state
+     - ConversationManager for multi-session support
+     - Configurable history length limits
+     - Integration with knowledge enhancement pipeline
+   - Impact:
+     - More maintainable conversation handling
+     - Better memory efficiency
+     - Cleaner integration with agent system
+     - Improved context management
+
+4. **Agent Routing and Processing Pipeline**
+   - Decision: Implement rule-based keyword matching for agent selection
+   - Implementation:
+     - Predefined keyword sets for each domain:
+       - Concordia CS: university, admission, requirements, etc.
+       - AI: machine learning, neural network, deep learning, etc.
+     - Simple counting mechanism for keyword matches
+     - Context-aware routing using conversation history
+     - Default fallback to General Agent
+   - Processing Pipeline:
+     - Conversation State Management:
+       - New/existing conversation handling
+       - History tracking and formatting
+     - Knowledge Enhancement:
+       - Agent-specific knowledge retrieval configuration
+       - Wikipedia integration for General and AI agents
+       - Vector store integration for AI and CS agents
+     - Query Processing:
+       - Structured prompt template system
+       - Conversation history integration
+       - Knowledge context incorporation
+       - Async LLM invocation
+   - Impact:
+     - Fast and predictable routing
+     - Minimal computational overhead
+     - Clear separation of concerns
+     - Maintainable and extensible design
+
+5. **Async Implementation**
    - Decision: Use async/await patterns throughout
    - Rationale:
      - Better resource utilization
@@ -170,10 +220,13 @@ demo/
 
 2. **Agent Coordination**
    - Challenge: Managing multiple specialized agents
-   - Solution: Clear domain boundaries and routing logic
+   - Solution: 
+     - Implemented efficient keyword-based routing in MultiAgentCoordinator
+     - Context-aware routing using conversation history
+     - Clear domain boundaries through predefined keyword sets
    - Remaining Issues:
-     - Edge cases in domain overlap
-     - Query classification accuracy
+     - Potential for expanding keyword sets based on usage
+     - Opportunity for more sophisticated matching patterns
 
 3. **Knowledge Integration**
    - Challenge: Integrating external knowledge effectively
