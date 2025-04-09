@@ -160,6 +160,41 @@ Key dependencies include:
 - `faiss-cpu`: Vector storage
 - `python-dotenv`: Environment management
 
+### 6.3 Implementation Challenges
+
+The development of this system presented several key challenges:
+
+1. **Local LLM Integration**
+   - Basic Ollama integration through environment variables
+   - CPU-only execution with standard settings
+   - Performance dependent on local hardware capabilities
+
+2. **Agent System Implementation**
+   - Keyword-based routing through MultiAgentCoordinator
+   - Domain-specific knowledge configurations per agent
+   - Basic conversation state management
+   - Current limitations in NLP capabilities
+
+3. **Knowledge Integration**
+   - Wikipedia integration via Langchain
+   - FAISS vector store implementation
+   - Basic knowledge enhancement without caching
+   - Limited knowledge source types
+
+4. **System Architecture**
+   - Basic async implementation with FastAPI
+   - In-memory conversation storage
+   - Simple configuration management
+   - Limited error handling and logging
+
+5. **Development Gaps**
+   - No testing infrastructure
+   - Basic error handling
+   - Limited documentation
+   - No monitoring systems
+
+These challenges represent our current implementation state and areas for future improvement.
+
 ## 7. Future Improvements
 
 Planned enhancements:
