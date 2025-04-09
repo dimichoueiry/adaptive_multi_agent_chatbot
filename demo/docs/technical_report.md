@@ -272,3 +272,6 @@ Primary areas for improvement:
 3. FAISS Documentation: https://github.com/facebookresearch/faiss
 4. Wikipedia API Documentation: https://wikipedia.readthedocs.io/
 5. Langchain Documentation: https://python.langchain.com/docs/
+
+
+** NB: A LOT OF THIS CODE WAS WRITTEN AND RESEARCHED WITH THE HELP OF AI **

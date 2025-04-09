@@ -176,3 +176,5 @@ demo/
 - The system maintains conversation context, so you can ask follow-up questions
 - You can specify a conversation_id to continue a previous conversation
 - The system automatically enhances responses with information from Wikipedia when relevant
+
+** NB: A LOT OF THIS CODE WAS WRITTEN AND RESEARCHED WITH THE HELP OF AI **
