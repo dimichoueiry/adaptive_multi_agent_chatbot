@@ -6,7 +6,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .router import router
-from ..config import API_HOST, API_PORT
 
 def create_app() -> FastAPI:
     """

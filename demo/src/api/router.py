@@ -5,8 +5,7 @@ API router for the chatbot endpoints.
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
-import asyncio
+from typing import Dict, Optional
 
 from ..agents import MultiAgentCoordinator
 from ..config import AGENTS

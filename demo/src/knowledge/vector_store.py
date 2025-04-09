@@ -3,9 +3,7 @@ Vector store implementation for storing and retrieving embeddings.
 """
 
 import os
-import shutil
-from typing import List, Dict, Any, Optional, Union
-import numpy as np
+from typing import List, Dict, Any, Optional
 import uuid
 import sys
 

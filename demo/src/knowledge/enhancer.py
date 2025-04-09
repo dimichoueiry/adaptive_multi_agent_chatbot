@@ -2,8 +2,7 @@
 Integration of external knowledge sources with agents.
 """
 
-from typing import List, Dict, Any, Optional
-import asyncio
+from typing import Dict, Any
 
 from ..knowledge import WikipediaSource, VectorStore
 from ..config import KNOWLEDGE_SOURCES

@@ -2,29 +2,13 @@
 
 ## Executive Summary
 
-This technical report details the design, implementation, and evaluation of an Adaptive Multi-Agent Chatbot System using Ollama. The system features a multi-agent architecture with specialized agents for different domains (Concordia CS admissions, AI knowledge, and general questions), leveraging modern language models through Ollama for natural language processing and understanding.
+This technical report details the architectural design, implementation decisions, and challenges encountered in developing an Adaptive Multi-Agent Chatbot System. The system implements a domain-specialized approach using multiple agents, each focusing on specific knowledge domains: Concordia CS admissions, AI knowledge, and general questions.
 
-## 1. Introduction
+## 1. Architectural Overview
 
-### 1.1 Project Objective
+### 1.1 System Architecture
 
-The objective of this project was to create an intelligent multi-agent chatbot system that can effectively handle queries across different specialized domains, particularly focusing on Concordia CS admissions, AI-related topics, and general knowledge questions.
-
-### 1.2 Problem Statement
-
-Traditional chatbots often face challenges with:
-- Domain specialization and expertise
-- Knowledge integration from external sources
-- Efficient query routing to appropriate specialized agents
-- Maintaining conversation coherence
-
-This project addresses these challenges through a modular multi-agent architecture and knowledge integration.
-
-## 2. System Architecture
-
-### 2.1 High-Level Architecture
-
-The system follows a modular architecture organized into the following components:
+The system follows a modular, layered architecture designed for extensibility and maintainability:
 
 ```
 demo/
@@ -40,96 +24,213 @@ demo/
 └── todo.md        # Development tasks
 ```
 
-### 2.2 Component Interactions
+### 1.2 Key Architectural Components
 
-The system operates through the following workflow:
+1. **API Layer**
+   - FastAPI-based RESTful interface
+   - Async/await pattern for improved performance
+   - OpenAPI/Swagger integration for documentation
+   - Request/response validation
 
-1. Client sends a query through the FastAPI endpoint
-2. Query is analyzed and routed to the appropriate specialized agent:
-   - Concordia CS Agent for university admissions queries
-   - AI Agent for artificial intelligence topics
-   - General Questions Agent for other topics
-3. The agent processes the query using Ollama
-4. Response is enhanced with external knowledge when relevant
-5. Final response is returned through the API
+2. **Agent Layer**
+   - Specialized agents for different domains
+   - Domain-specific knowledge handling
+   - Query processing and response generation
 
-### 2.3 Technology Stack
+3. **Knowledge Layer**
+   - Wikipedia integration for external knowledge
+   - FAISS vector store for efficient information retrieval
+   - Knowledge enhancement pipeline
 
-The implementation utilizes:
+4. **Configuration Layer**
+   - Environment-based configuration
+   - Flexible deployment settings
+   - Centralized configuration management
 
-- **Ollama**: Core language model integration
-- **FastAPI**: RESTful API framework
-- **Python 3.10+**: Primary programming language
-- **FAISS**: Vector storage for embeddings
-- **Wikipedia API**: External knowledge integration
-- **Langchain**: LLM framework integration
-- **Uvicorn**: ASGI server
-- **Python-dotenv**: Environment management
+## 2. Design Decisions
 
-## 3. Implementation Details
+### 2.1 Choice of Technologies
 
-### 3.1 Multi-Agent System
+1. **Ollama for LLM Integration**
+   - Reasons:
+     - Local model deployment capability
+     - Good performance characteristics
+     - Easy integration and API
+   - Trade-offs:
+     - Limited to available Ollama models
+     - Requires local resources
 
-The system implements three specialized agents:
-- **Concordia CS Agent**: Handles queries about Concordia's Computer Science program
-- **AI Agent**: Processes artificial intelligence related questions
-- **General Questions Agent**: Manages general knowledge queries
+2. **FastAPI Framework**
+   - Reasons:
+     - Modern async support
+     - Automatic OpenAPI documentation
+     - High performance
+   - Trade-offs:
+     - Learning curve for async patterns
+     - More complex than simpler frameworks
 
-### 3.2 Knowledge Integration
+3. **FAISS vs ChromaDB Decision**
+   - Decision Context:
+     - Need for efficient vector similarity search
+     - Requirement for scalable embedding storage
+     - Performance considerations for real-time queries
 
-External knowledge integration is implemented through:
-- **Wikipedia Integration**: Retrieves relevant information from Wikipedia
-- **Vector Store**: Uses FAISS for document embeddings and retrieval
+   - FAISS Advantages:
+     - Better performance for large-scale similarity search
+     - More mature and battle-tested in production environments
+     - Lower memory overhead for similar workloads
+     - Direct control over index structures
+     - Better support for custom distance metrics
+     - More flexible deployment options
 
-### 3.3 API Implementation
+   - ChromaDB Trade-offs:
+     - Easier initial setup and API
+     - Built-in persistence layer
+     - More features out of the box
+     - Higher level of abstraction
+     - Potentially higher resource usage
+     - Less control over underlying implementation
 
-The API layer is implemented using FastAPI with:
-- **REST Endpoints**: For chat interactions
-- **Async Support**: For better performance
-- **OpenAPI Documentation**: Auto-generated API documentation
-- **ReDoc Integration**: Alternative API documentation view
+   - Decision Rationale:
+     - FAISS chosen for:
+       - Better performance characteristics
+       - More control over implementation details
+       - Lower resource overhead
+       - Future scalability considerations
+       - Better integration with custom indexing strategies
 
-## 4. Evaluation
+   - Impact:
+     - More initial development effort required
+     - Better long-term performance and scalability
+     - More flexibility for future optimizations
+     - Reduced operational costs
 
-### 4.1 Functionality Assessment
+4. **Other Technology Choices**
+   - FAISS for vector storage
+   - Wikipedia integration for external knowledge
+   - Knowledge enhancement pipeline
 
-The system successfully implements:
-- Multi-agent architecture with three specialized agents
-- External knowledge integration through Wikipedia
-- FastAPI-based interface with comprehensive documentation
-- Modular and maintainable codebase structure
+### 2.2 Architectural Decisions
 
-### 4.2 Performance Considerations
+1. **Multi-Agent Design**
+   - Decision: Implement specialized agents instead of a single general agent
+   - Rationale:
+     - Better domain-specific responses
+     - Easier to maintain and extend
+     - Clear separation of concerns
+   - Impact:
+     - More modular codebase
+     - Simplified agent development
+     - Better response quality in specialized domains
 
-The system is designed for efficiency through:
-- Async API implementation
-- Efficient query routing to specialized agents
-- Vector-based knowledge retrieval
-- Environment-based configuration
+2. **Modular Structure**
+   - Decision: Strict separation of concerns with dedicated modules
+   - Rationale:
+     - Easier maintenance
+     - Better code organization
+     - Simplified testing
+   - Impact:
+     - Clear dependency boundaries
+     - Reduced coupling
+     - Improved code reusability
 
-### 4.3 Current Limitations
+3. **Async Implementation**
+   - Decision: Use async/await patterns throughout
+   - Rationale:
+     - Better resource utilization
+     - Improved scalability
+     - Modern Python best practices
+   - Impact:
+     - More complex implementation
+     - Better handling of concurrent requests
+     - Improved response times
 
-Areas for improvement include:
-- Limited number of specialized agents
-- Single external knowledge source (Wikipedia)
-- Basic authentication and security features
-- Limited caching implementation
+## 3. Implementation Challenges
 
-## 5. Future Work
+### 3.1 Technical Challenges
 
-Planned enhancements include:
-- Implementation of additional specialized agents
-- Integration of authentication and rate limiting
-- Enhanced knowledge base integration
-- Addition of monitoring and logging
-- Implementation of caching mechanisms
-- Development of comprehensive test suite
+1. **Agent Coordination**
+   - Challenge: Managing multiple specialized agents
+   - Solution: Clear domain boundaries and routing logic
+   - Remaining Issues:
+     - Edge cases in domain overlap
+     - Query classification accuracy
 
-## 6. Conclusion
+2. **Knowledge Integration**
+   - Challenge: Integrating external knowledge effectively
+   - Solution: Structured knowledge pipeline with Wikipedia
+   - Remaining Issues:
+     - Limited knowledge sources
+     - Real-time integration performance
 
-The Adaptive Multi-Agent Chatbot System successfully demonstrates a practical implementation of a domain-specialized chatbot system. The modular architecture, specialized agents, and external knowledge integration provide a solid foundation for future enhancements and extensions.
+3. **Vector Store Implementation**
+   - Challenge: Efficient document embedding and retrieval
+   - Solution: FAISS implementation with optimized indexing
+   - Remaining Issues:
+     - Memory usage optimization
+     - Index update strategies
 
-## 7. References
+### 3.2 Development Challenges
+
+1. **Environment Management**
+   - Challenge: Consistent configuration across deployments
+   - Solution: Centralized environment configuration
+   - Impact: Simplified deployment and testing
+
+2. **Dependency Management**
+   - Challenge: Complex dependency tree with multiple integrations
+   - Solution: Strict requirements.txt management
+   - Impact: Reliable dependency resolution
+
+3. **Testing Complexity**
+   - Challenge: Testing async code and LLM interactions
+   - Solution: Structured test architecture (planned)
+   - Impact: Current limited test coverage
+
+## 4. Future Considerations
+
+### 4.1 Architectural Improvements
+
+1. **Scalability Enhancements**
+   - Load balancing for multiple instances
+   - Distributed vector store implementation
+   - Caching layer integration
+
+2. **Security Improvements**
+   - Authentication system
+   - Rate limiting
+   - Request validation
+
+3. **Monitoring and Logging**
+   - Performance metrics collection
+   - Error tracking
+   - Usage analytics
+
+### 4.2 Technical Debt
+
+Current areas requiring attention:
+1. Limited test coverage
+2. Basic error handling
+3. Missing monitoring infrastructure
+4. Limited documentation of internal APIs
+
+## 5. Conclusion
+
+The Adaptive Multi-Agent Chatbot System demonstrates a practical implementation of a domain-specialized chatbot architecture. The design decisions and architectural choices provide a solid foundation for future enhancements while addressing current requirements effectively.
+
+Key strengths of the current implementation:
+- Modular and maintainable architecture
+- Effective domain specialization
+- Efficient async implementation
+- Extensible knowledge integration
+
+Primary areas for improvement:
+- Enhanced testing infrastructure
+- Expanded monitoring capabilities
+- Additional specialized agents
+- Improved error handling
+
+## 6. References
 
 1. Ollama Documentation: https://ollama.com/docs
 2. FastAPI Documentation: https://fastapi.tiangolo.com/
