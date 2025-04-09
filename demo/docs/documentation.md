@@ -151,4 +151,4 @@ Planned enhancements:
 - Implement caching for improved performance
 - Add unit and integration tests
 
-** NB: A LOT OF THIS CODE WAS WRITTEN AND RESEARCHED WITH THE HELP OF AI **
+** NB: THIS CODEBASE HAS AI WRITTEN CODE **

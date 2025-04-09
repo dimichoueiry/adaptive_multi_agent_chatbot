@@ -274,4 +274,4 @@ Primary areas for improvement:
 5. Langchain Documentation: https://python.langchain.com/docs/
 
 
-** NB: A LOT OF THIS CODE WAS WRITTEN AND RESEARCHED WITH THE HELP OF AI **
+** NB: THIS CODEBASE HAS AI WRITTEN CODE **
