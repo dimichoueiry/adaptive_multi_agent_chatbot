@@ -14,14 +14,14 @@
   - [x] AI-related questions agent
   - [x] Multi-agent coordinator
   - [x] API integration
-- [ ] Implement context-awareness features
-  - [ ] User history tracking
-  - [ ] Conversation flow maintenance
+- [X] Implement context-awareness features
+  - [X] User history tracking
+  - [X] Conversation flow maintenance
 - [x] Integrate external knowledge sources
   - [x] Wikipedia API integration
   - [x] Knowledge enhancer implementation
   - [x] Integration with agent coordinator
-  - [ ] Vector database setup (FAISS or ChromaDB)
+  - [X] Vector database setup (FAISS or ChromaDB)
 - [x] Develop API and interface
   - [x] FastAPI implementation
   - [x] Multi-turn conversation handling
