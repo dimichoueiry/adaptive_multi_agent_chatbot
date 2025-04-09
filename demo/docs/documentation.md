@@ -136,9 +136,8 @@ Key dependencies include:
 - `fastapi`: Web framework
 - `uvicorn`: ASGI server
 - `ollama`: LLM integration
-- `langchain`: LLM framework
+- `langchain`: LLM framework and Wikipedia integration
 - `faiss-cpu`: Vector storage
-- `wikipedia`: Knowledge base integration
 - `python-dotenv`: Environment management
 
 ## 7. Future Improvements

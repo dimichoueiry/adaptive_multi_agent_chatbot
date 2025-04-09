@@ -270,8 +270,7 @@ Primary areas for improvement:
 1. Ollama Documentation: https://ollama.com/docs
 2. FastAPI Documentation: https://fastapi.tiangolo.com/
 3. FAISS Documentation: https://github.com/facebookresearch/faiss
-4. Wikipedia API Documentation: https://wikipedia.readthedocs.io/
+4. Langchain Wikipedia Tools: https://python.langchain.com/docs/integrations/tools/wikipedia
 5. Langchain Documentation: https://python.langchain.com/docs/
-
 
 ** NB: THIS CODEBASE HAS AI WRITTEN CODE **
